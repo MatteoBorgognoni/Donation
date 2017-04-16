@@ -1,0 +1,15 @@
+donation.donation_type.*:
+  type: config_entity
+  label: 'Donation profile config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    payment_method:
+      type: string
+      label: 'Payment Method'
+    uuid:
+      type: string

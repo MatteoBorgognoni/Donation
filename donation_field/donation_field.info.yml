@@ -1,0 +1,5 @@
+name: Donation Field
+type: module
+description: Provides a Donation field type
+core: 8.x
+package: Donation

@@ -1,0 +1,5 @@
+name: Donation
+type: module
+description: Donation Entity
+core: 8.x
+package: Donation

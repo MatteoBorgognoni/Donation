@@ -1,0 +1,7 @@
+field.widget.settings.donation_payment:
+  type: mapping
+  label: 'Donation Payment widget settings'
+  mapping:
+    payment_method:
+      type: string
+      label: 'Payment Method'

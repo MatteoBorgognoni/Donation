@@ -1,0 +1,4 @@
+services:
+  plugin.manager.donation_method:
+    class: Drupal\donation\Plugin\DonationMethodManager
+    parent: default_plugin_manager

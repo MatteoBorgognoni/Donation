@@ -1,0 +1,7 @@
+donation_field.donation_page_build:
+  path: 'donate'
+  defaults:
+    _controller: '\Drupal\donation_field\Controller\DonationPage::build'
+    _title: 'Donate'
+  requirements:
+    _permission: 'access content'
