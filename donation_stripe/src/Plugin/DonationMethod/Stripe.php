@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\donation\Plugin\DonationMethod;
+namespace Drupal\donation_stripe\Plugin\DonationMethod;
 
 use Drupal\donation\Plugin\DonationMethodBase ;
 

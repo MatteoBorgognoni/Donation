@@ -77,7 +77,7 @@ class DonationCustomer extends FormatterBase {
     $customerfields = Widget::customerFields();
     
     $values = $item->getValue();
-    ksm($values);
+    
     foreach ($values as $key => $value) {
       if (is_string($value) && !empty($value)) {
         $output = '<div class="field__label">' . $customerfields[$key]['title'] . '</div>';
