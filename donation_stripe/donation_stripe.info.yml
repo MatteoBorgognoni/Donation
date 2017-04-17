@@ -1,0 +1,7 @@
+name: Donation Stripe
+type: module
+description: Stripe Payment method for donation
+core: 8.x
+package: Donation
+dependencies:
+  - donation

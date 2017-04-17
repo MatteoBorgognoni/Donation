@@ -1,0 +1,11 @@
+{
+  "name": "drupal/donation_stripe",
+  "type": "drupal-module",
+  "description": "Stripe Payment method for donation",
+  "keywords": ["Donation", "Payment", "Stripe"],
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev",
+  "require": {
+    "stripe/stripe-php": "*"
+  }
+}

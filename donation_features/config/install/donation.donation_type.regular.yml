@@ -1,0 +1,6 @@
+langcode: en
+status: true
+dependencies: {  }
+id: regular
+label: Regular
+payment_method: null

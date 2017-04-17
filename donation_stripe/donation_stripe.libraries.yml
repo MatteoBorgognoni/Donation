@@ -1,0 +1,7 @@
+donation_stripe_js:
+  version: 1.x
+  js:
+    js/donation-stripe.js: {}
+  dependencies:
+  - core/jquery
+  - core/drupalSettings

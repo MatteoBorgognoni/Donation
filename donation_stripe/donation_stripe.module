@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Contains donation_stripe.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function donation_stripe_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the donation_stripe module.
+    case 'help.page.donation_stripe':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Stripe Payment method for donation') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+//
+///**
+// * Implements hook_entity_type_build().
+// */
+//function donation_stripe_entity_type_build(array &$entity_types) {
+//  $entity_types['donation']->setFormClass('stripe', 'Drupal\donation_stripe\Form\DonationStripeForm');
+//}
+
+
+/**
+ * Implements hook_page_attachments().
+ */
+function donation_stripe_page_attachments(&$attachments) {
+  
+  $attachments['#attached']['html_head'][] = [
+    [
+      '#type' => 'html_tag',
+      '#tag' => 'script',
+      '#weight' => 100,
+      '#attributes' => [
+        'src' => 'https://js.stripe.com/v2/',
+      ],
+    ],
+    'stripe-js'
+  ];
+
+}

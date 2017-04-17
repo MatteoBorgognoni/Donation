@@ -1,0 +1,7 @@
+donation_stripe.settings_form:
+  title: 'Donation Stripe Settings'
+  route_name: donation_stripe.settings_form
+  description: 'Settings for Donation Stripe integration'
+  parent: system.admin_config_system
+  weight: 99
+

@@ -1,0 +1,73 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_form_mode.donation.donate
+    - donation.donation_type.single
+  module:
+    - donation
+id: donation.single.donate
+targetEntityType: donation
+bundle: single
+mode: donate
+content:
+  amount:
+    type: number
+    weight: -7
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  currency_code:
+    type: string_textfield
+    weight: -6
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  customer:
+    type: donation_customer
+    weight: -4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  donation_type:
+    type: boolean_checkbox
+    weight: -8
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  gift_aid:
+    type: boolean_checkbox
+    weight: -2
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  line_item:
+    type: string_textfield
+    weight: -10
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  payment_details:
+    type: donation_payment
+    weight: -3
+    region: content
+    settings:
+      payment_method: basic
+    third_party_settings: {  }
+  reference:
+    type: entity_reference_autocomplete
+    weight: -9
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    region: content
+    third_party_settings: {  }
+hidden: {  }

@@ -1,0 +1,6 @@
+langcode: en
+status: true
+dependencies: {  }
+id: single
+label: Single
+payment_method: null

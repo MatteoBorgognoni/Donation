@@ -1,0 +1,7 @@
+name: 'Donation Features'
+type: module
+core: 8.x
+dependencies:
+  - donation
+  - field_group
+version: 8.x-1.0
