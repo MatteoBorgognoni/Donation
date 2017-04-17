@@ -65,55 +65,59 @@ class DonationPayment extends WidgetBase implements ContainerFactoryPluginInterf
       $container->get('plugin.manager.donation_method'));
   }
   
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultSettings() {
-    return [
-        'payment_method' => '',
-      ] + parent::defaultSettings();
-  }
-  
-  
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
-    
-    $available_methods = $this->donationMethodManager->getDefinitions();
-    
-    $methods = [];
-    foreach ($available_methods as $method) {
-      $methods[$method['id']] = $method['label']->render();
-    }
-    
-    $element['payment_method'] = [
-      '#type' => 'select',
-      '#title' => t('Payment Method'),
-      '#default_value' => $this->getSetting('payment_method'),
-      '#options' => $methods,
-    ];
-    return $element;
-  }
-  
-  
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsSummary() {
-    $summary = [];
-
-    $summary[] = t('Payment Method: @method', ['@method' => $this->getSetting('payment_method')]);
-
-    return $summary;
-  }
+//  /**
+//   * {@inheritdoc}
+//   */
+//  public static function defaultSettings() {
+//    return [
+//        'payment_method' => '',
+//      ] + parent::defaultSettings();
+//  }
+//
+//
+//  /**
+//   * {@inheritdoc}
+//   */
+//  public function settingsForm(array $form, FormStateInterface $form_state) {
+//
+//    $available_methods = $this->donationMethodManager->getDefinitions();
+//
+//    $methods = [];
+//    foreach ($available_methods as $method) {
+//      $methods[$method['id']] = $method['label']->render();
+//    }
+//
+//    $element['payment_method'] = [
+//      '#type' => 'select',
+//      '#title' => t('Payment Method'),
+//      '#default_value' => $this->getSetting('payment_method'),
+//      '#options' => $methods,
+//    ];
+//    return $element;
+//  }
+//
+//
+//  /**
+//   * {@inheritdoc}
+//   */
+//  public function settingsSummary() {
+//    $summary = [];
+//
+//    $summary[] = t('Payment Method: @method', ['@method' => $this->getSetting('payment_method')]);
+//
+//    return $summary;
+//  }
 
   /**
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     
-    $method_id = $this->getSetting('payment_method');
+    $build_info = $form_state->getBuildInfo();
+    $settings = $build_info['callback_object']->getBundleSettings();
+    
+    $method_id = $settings->get('payment_method');
+    
     $instance = $this->donationMethodManager->createInstance($method_id);
 
     $element = $instance->appendform();

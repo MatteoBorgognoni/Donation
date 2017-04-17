@@ -1,6 +1,5 @@
-
 donation_stripe.settings_form:
-  path: '/admin/config/donation/donation_stripe/settings'
+  path: '/admin/config/donation/stripe/settings'
   defaults:
     _form: '\Drupal\donation_stripe\Form\SettingsForm'
     _title: 'SettingsForm'

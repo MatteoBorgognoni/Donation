@@ -61,6 +61,25 @@ interface DonationInterface extends  ContentEntityInterface, EntityChangedInterf
    */
   public function setAmount($amount);
   
+  /**
+   * Gets the Currency code.
+   *
+   * @return string
+   *   Currency code.
+   */
+  public function getCurrencyCode();
+  
+  /**
+   * Sets the Currency Code.
+   *
+   * @param string $currency_code
+   *   The Currency Code for this Donation.
+   *
+   * @return \Drupal\donation\Entity\DonationInterface
+   *   The called Donation entity.
+   */
+  public function setCurrencyCode($amount);
+  
   
   /**
    * Gets the Donation Page .
@@ -80,6 +99,27 @@ interface DonationInterface extends  ContentEntityInterface, EntityChangedInterf
    *   The called Donation entity.
    */
   public function setReference($reference_array);
+  
+  
+  /**
+   * Gets the Payment Method id.
+   *
+   * @return string
+   *   Payment Method plugin id.
+   */
+  public function getPaymentMethod();
+  
+  /**
+   * Sets the Payment Method id.
+   *
+   * @param string $payment_method_id
+   *   The Payment Method plugin id.
+   *
+   * @return \Drupal\donation\Entity\DonationInterface
+   *   The called Donation entity.
+   */
+  public function setPaymentMethod($payment_method_id);
+  
   
   /**
    * Gets the Donation creation timestamp.

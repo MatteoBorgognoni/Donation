@@ -16,3 +16,8 @@ entity.donation_type.collection:
   parent: system.admin_structure
   weight: 99
 
+donation.donation_settings:
+  title: 'Donation Settings'
+  route_name: donation.donation_settings
+  parent: system.admin_config
+  weight: 99

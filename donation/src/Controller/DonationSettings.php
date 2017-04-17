@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\donation_field\Controller;
+namespace Drupal\donation\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\EntityFormBuilder;
 use Drupal\Core\Session\SessionManager;
+use Drupal\Core\Render\Element\Table;
 
 
 
@@ -16,7 +17,7 @@ use Drupal\Core\Session\SessionManager;
  *
  * @package Drupal\donation\Controller
  */
-class DonationPage extends ControllerBase {
+class DonationSettings extends ControllerBase {
   
  
   /**
@@ -72,26 +73,13 @@ class DonationPage extends ControllerBase {
    * Build.
    *
    * @return string
-   *   Return Hello string.
+   *   Return Page.
    */
   public function build() {
-    
-    $settings = $_SESSION['donation'];
-  
-    $values = [
-      'type' => $settings['donation_profile'],
-    ];
-    
-    $donation = $this->entityTypeManager->getStorage('donation')->create($values);
-    $donation->setAmount($settings['amount']);
-    $donation->setReference($settings['reference']);
-    
-    $form = $this->entityFormBuilder->getForm($donation);
-    
-    
+
     return [
       '#type' => 'markup',
-      '#markup' => render($form),
+      '#markup' => 'Test',
     ];
   }
 

@@ -3,8 +3,8 @@
 namespace Drupal\donation\Plugin;
 
 use Drupal\donation\Entity\DonationInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines an interface for Donation method plugins.
@@ -46,6 +46,6 @@ interface DonationMethodInterface extends PluginInspectionInterface  {
    *   The Donation Entity being saved passed as reference.
    *
    */
-  public function execute(DonationInterface &$donation);
+  public function execute(DonationInterface &$donation, array $form, FormStateInterface $form_state);
 
 }

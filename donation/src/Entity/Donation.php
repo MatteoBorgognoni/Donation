@@ -107,6 +107,21 @@ class Donation extends ContentEntityBase implements DonationInterface {
     return $this;
   }
   
+  /**
+   * {@inheritdoc}
+   */
+  public function getCurrencyCode() {
+    return $this->get('currency_code')->value;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function setCurrencyCode($currency_code) {
+    $this->set('currency_code', $currency_code);
+    return $this;
+  }
+  
   
   /**
    * {@inheritdoc}
@@ -131,6 +146,21 @@ class Donation extends ContentEntityBase implements DonationInterface {
     return $this;
   }
   
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getPaymentMethod() {
+    return $this->get('payment_details')->value;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function setPaymentMethod($payment_method_id) {
+    $this->set('payment_details', $payment_method_id);
+    return $this;
+  }
 
   /**
    * {@inheritdoc}

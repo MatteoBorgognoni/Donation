@@ -1,0 +1,15 @@
+donation.donation_settings:
+  path: '/admin/config/donation'
+  defaults:
+    _controller: '\Drupal\donation\Controller\DonationSettings::build'
+    _title: 'Donation Settings'
+  requirements:
+    _permission: 'administer donation entities'
+
+donation.donation_page_build:
+  path: 'donate'
+  defaults:
+    _controller: '\Drupal\donation\Controller\DonationPage::build'
+    _title: 'Donate'
+  requirements:
+    _permission: 'access content'

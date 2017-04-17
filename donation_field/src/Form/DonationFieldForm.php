@@ -72,7 +72,7 @@ class DonationFieldForm extends FormBase implements FormInterface {
     $amount = $values['amount'];
     $_SESSION['donation']['amount'] = $amount;
     
-    $url = \Drupal\Core\Url::fromRoute('donation_field.donation_page_build');
+    $url = \Drupal\Core\Url::fromRoute('donation.donation_page_build');
     $form_state->setRebuild(FALSE);
     $form_state->setRedirectUrl($url);
   }

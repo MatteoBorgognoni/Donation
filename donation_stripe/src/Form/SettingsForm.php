@@ -33,6 +33,14 @@ class SettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('donation_stripe.settings');
+    
+    $form['mode'] = [
+      '#type' => 'select',
+      '#title' => 'Payment Mode',
+      '#options' => ['test' => 'Test', 'live' => 'Live'],
+      '#default_value' => $config->get('mode'),
+    ];
+    
     $form['test_settings'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Test Settings'),
@@ -86,6 +94,7 @@ class SettingsForm extends ConfigFormBase {
     parent::submitForm($form, $form_state);
 
     $this->config('donation_stripe.settings')
+      ->set('mode', $form_state->getValue('mode'))
       ->set('test_secret_key', $form_state->getValue('test_secret_key'))
       ->set('test_publishable_key', $form_state->getValue('test_publishable_key'))
       ->set('live_secret_key', $form_state->getValue('live_secret_key'))

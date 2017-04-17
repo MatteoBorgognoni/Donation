@@ -2,7 +2,12 @@
 
 namespace Drupal\donation_stripe\Plugin\DonationMethod;
 
-use Drupal\donation\Plugin\DonationMethodBase ;
+use Drupal\donation\Plugin\DonationMethodBase;
+use Drupal\donation\Entity\DonationInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Stripe\Stripe as StripeApi;
+use Stripe\Charge;
+use Stripe\Error;
 
 /**
  * @DonationMethod(
@@ -19,6 +24,14 @@ class Stripe extends DonationMethodBase {
   public function appendForm() {
     $elements = [];
   
+    $config = \Drupal::config('donation_stripe.settings');
+    $mode = $config->get('mode');
+    
+    $key = $config->get($mode . '_publishable_key');
+    $elements['#attached']['drupalSettings']['donation_stripe']['key'] = $key;
+    
+    $elements['#attached']['library'] = ['donation_stripe/donation_stripe_js'];
+    
     $elements['card_number'] = array(
       '#title' => t('Card Number'),
       '#type' => 'textfield',
@@ -26,14 +39,6 @@ class Stripe extends DonationMethodBase {
       '#maxlength' => 20,
       '#attributes' => ['autocomplete' => 'off', 'name' => '', 'class' => ['card-number']],
   
-    );
-  
-    $elements['cvc'] = array(
-      '#title' => t('CVC'),
-      '#type' => 'textfield',
-      '#size' => 4,
-      '#maxlength' => 4,
-      '#attributes' => ['autocomplete' => 'off', 'name' => '', 'class' => ['card-cvc']],
     );
   
     $months = range(1, 12);
@@ -61,6 +66,15 @@ class Stripe extends DonationMethodBase {
       '#attributes' => ['autocomplete' => 'off', 'name' => '', 'class' => ['card-expiry-year']],
     );
   
+  
+    $elements['cvc'] = array(
+      '#title' => t('CVC'),
+      '#type' => 'textfield',
+      '#size' => 4,
+      '#maxlength' => 4,
+      '#attributes' => ['autocomplete' => 'off', 'name' => '', 'class' => ['card-cvc']],
+    );
+  
     $elements['stripeToken'] = array(
       '#type' => 'hidden',
       '#name' => 'stripeToken',
@@ -77,5 +91,39 @@ class Stripe extends DonationMethodBase {
 
     return $elements;
   }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function execute(DonationInterface &$donation, array $form, FormStateInterface $form_state) {
+  
+    $config = \Drupal::config('donation_stripe.settings');
+    $mode = $config->get('mode');
+  
+    $key = $config->get($mode . '_secret_key');
+  
+    $token = $form_state->getUserInput()['stripeToken'];
+  
+    StripeApi::setApiKey($key);
+  
+    $amount = $donation->getAmount();
+    $currency = $donation->getCurrencyCode();
+  
+    try {
+      $charge = Charge::create(array(
+        'amount' => $amount, // Amount in cents!
+        'currency' => $currency,
+        'source' => $token,
+      ));
+      ksm($charge);
+    } catch (Error\Card $e) {
+      //TODO:  handling errors
+      $charge = FALSE;
+    }
+    
+    return $charge;
+  
+  }
+  
   
 }

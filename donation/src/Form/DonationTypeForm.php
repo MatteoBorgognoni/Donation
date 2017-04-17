@@ -39,28 +39,27 @@ class DonationTypeForm extends EntityForm {
       '#disabled' => !$donation_type->isNew(),
     ];
   
-//    $methodManager = \Drupal::service('plugin.manager.donation_method');
-//    $available_methods = $methodManager->getDefinitions();
-//
-//    $methods = [];
-//    foreach ($available_methods as $method) {
-//      $methods[$method['id']] = $method['label']->render();
-//    }
-//
-//    $default = '';
-//    if (method_exists($donation_type, 'paymentMethod' )) {
-//      $default = $donation_type->paymentMethod()['id'];
-//    }
-//
-//    ksm($default);
-//    // the payment method used in this Donation profile AKA plugin_id of type DonationMethod
-//
-//    $form['payment_method'] = [
-//      '#type' => 'select',
-//      '#title' => 'Payment Method',
-//      '#options' => $methods,
-//      '#default_value' => $default,
-//    ];
+    $methodManager = \Drupal::service('plugin.manager.donation_method');
+    $available_methods = $methodManager->getDefinitions();
+
+    $methods = [];
+    foreach ($available_methods as $method) {
+      $methods[$method['id']] = $method['label']->render();
+    }
+
+    $default = '';
+    if (method_exists($donation_type, 'paymentMethod' )) {
+      $default = $donation_type->paymentMethod();
+    }
+
+    // the payment method used in this Donation profile AKA plugin_id of type DonationMethod
+
+    $form['payment_method'] = [
+      '#type' => 'select',
+      '#title' => 'Payment Method',
+      '#options' => $methods,
+      '#default_value' => $default,
+    ];
 
     /* You will need additional form elements for your custom properties. */
 
@@ -75,12 +74,10 @@ class DonationTypeForm extends EntityForm {
     $status = $donation_type->save();
     $donation_type->set('type', trim($donation_type->id()));
     $donation_type->set('label', trim($donation_type->label()));
-    
-    ksm($donation_type);
+    $donation_type->set('payment_method', trim($donation_type->paymentMethod()));
 
     switch ($status) {
       case SAVED_NEW:
-        donation_add_payment_field($donation_type);
         drupal_set_message($this->t('Created the %label Donation type.', [
           '%label' => $donation_type->label(),
         ]));

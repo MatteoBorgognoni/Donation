@@ -163,7 +163,6 @@ class DonationCustomer extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $values = $items[$delta]->getValue();
     $settings = $this->getSetting('visible_elements');
-    ksm($settings);
     foreach ($this->customerFields() as $key => $field) {
       if (in_array($key, $settings, TRUE)) {
         $element[$key] = $this->prepareField($field);

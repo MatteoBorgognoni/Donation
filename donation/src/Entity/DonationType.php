@@ -55,6 +55,16 @@ class DonationType extends ConfigEntityBundleBase implements DonationTypeInterfa
   protected $label;
   
   
+  /**
+   * The Payment Method id.
+   *
+   * @var string
+   */
+  protected $payment_method;
+  
+  public function paymentMethod() {
+    return $this->payment_method;
+  }
   
   protected function methodManager() {
     return \Drupal::service('plugin.manager.donation_method');

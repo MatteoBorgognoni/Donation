@@ -2,6 +2,7 @@
 
     console.log(drupalSettings);
     var pubKey = drupalSettings.donation_stripe.key;
+    var formId = '#' + drupalSettings.donation.form_id;
 
     Stripe.setPublishableKey(pubKey);
 
@@ -18,10 +19,8 @@
     $(document).ready(function() {
 
 
-
-        console.log(Stripe);
         // Watch for a form submission:
-        $('#donation-stripe-stripe-form').submit(function(event) {
+        $(formId).submit(function(event) {
 
             $('#edit-submit').prop('disabled', true);
 
@@ -70,7 +69,7 @@
     // Function handles the Stripe response:
     function stripeResponseHandler(status, response) {
 
-        var $form = $('#donation-stripe-stripe-form');
+        var $form = $(formId);
 
         // Check for an error:
         if (response.error) {

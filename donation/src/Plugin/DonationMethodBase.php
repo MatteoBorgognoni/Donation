@@ -4,7 +4,7 @@ namespace Drupal\donation\Plugin;
 
 use Drupal\donation\Entity\DonationInterface;
 use Drupal\Component\Plugin\PluginBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Base class for Donation method plugins.
@@ -35,7 +35,7 @@ abstract class DonationMethodBase extends PluginBase implements DonationMethodIn
   /**
    * {@inheritdoc}
    */
-  public function execute(DonationInterface &$donation) {}
+  public function execute(DonationInterface &$donation, array $form, FormStateInterface $form_state) {}
   
   
 }

@@ -8,4 +8,3 @@ entity.donation_type.add_form:
   title: 'Add Donation type'
   appears_on:
     - entity.donation_type.collection
-
