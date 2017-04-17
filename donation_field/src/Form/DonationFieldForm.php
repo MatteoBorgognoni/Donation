@@ -57,7 +57,7 @@ class DonationFieldForm extends FormBase implements FormInterface {
       '#type' => 'submit',
       '#value' => $this->t('Donate'),
     ];
-    ksm($_SESSION);
+    
     return $form;
   }
   

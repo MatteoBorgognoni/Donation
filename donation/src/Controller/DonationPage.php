@@ -77,12 +77,12 @@ class DonationPage extends ControllerBase {
   public function build() {
     
     $settings = $_SESSION['donation'];
-    ksm($settings);
     $values = [
       'type' => $settings['donation_profile'],
     ];
     
     $donation = $this->entityTypeManager->getStorage('donation')->create($values);
+    
     $donation->setAmount($settings['amount']);
     $donation->setReference($settings['reference']);
     $donation->setPaymentMethod($settings['donation_method']);

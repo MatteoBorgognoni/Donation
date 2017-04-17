@@ -63,19 +63,22 @@ class DonationForm extends ContentEntityForm implements ContentEntityFormInterfa
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-
+  
     /* @var $entity \Drupal\donation\Entity\Donation */
+    $entity = $this->entity;
+    
     $form = parent::buildForm($form, $form_state);
   
-    $entity = $this->entity;
+    ksm($_SESSION['donation']['redirect']);
     return $form;
+    
+    
   }
 
   public function pay(array $form, FormStateInterface $form_state) {
     
     $settings = $this->getBundleSettings();
     $method_id = $settings->get('payment_method');
-
     //$method = $this->methodManager->createInstance($method_id)->execute($this->entity, $form, $form_state);
   }
   
@@ -87,9 +90,6 @@ class DonationForm extends ContentEntityForm implements ContentEntityFormInterfa
     $status = parent::save($form, $form_state);
   
     $this->pay($form, $form_state);
-    
-    //$this->methodManager->
-    
 
 //    switch ($status) {
 //      case SAVED_NEW:
@@ -103,9 +103,14 @@ class DonationForm extends ContentEntityForm implements ContentEntityFormInterfa
 //          '%label' => $entity->label(),
 //        ]));
 //    }
-    $redirect =
     
-    $form_state->setRedirect('entity.donation.canonical', ['donation' => $entity->id()]);
+    $redirect = $_SESSION['donation']['redirect'];
+    unset($_SESSION['donation']);
+    
+    $redirect_entity_type = array_keys($redirect)[0];
+    $route = 'entity.' . $redirect_entity_type . '.canonical';
+    
+    $form_state->setRedirect($route, $redirect);
   }
   
   
