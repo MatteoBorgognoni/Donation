@@ -7,7 +7,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\user\UserInterface;
+use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Database\Connection as Database;
 
 /**
  * Defines the Donation entity.
@@ -95,9 +96,29 @@ class Donation extends ContentEntityBase implements DonationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAmount() {
-    return $this->get('amount')->value / 100;
+  public function getAmount($raw = FALSE) {
+    switch ($raw) {
+      case TRUE:
+        return $this->get('amount')->value;
+        break;
+      case FALSE:
+        return $this->get('amount')->value / 100;
+        break;
+    }
   }
+  
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormattedAmount() {
+    $amount = $this->getAmount();
+    
+    setlocale(LC_MONETARY, 'en_GB.UTF-8');
+    $amount = money_format('%n', $amount);
+    return $amount;
+  }
+  
   
   /**
    * {@inheritdoc}
@@ -126,8 +147,17 @@ class Donation extends ContentEntityBase implements DonationInterface {
   /**
    * {@inheritdoc}
    */
-  public function getReference() {
-    $reference = unserialize($this->get('reference')->value);
+  public function getReference($object = FALSE) {
+    switch ($object) {
+      case TRUE:
+        $reference_values = unserialize($this->get('reference')->value);
+        $reference = \Drupal::entityTypeManager()->getStorage($reference_values['entity_type'])->load($reference_values['id']);
+        break;
+      case FALSE:
+        $reference = unserialize($this->get('reference')->value);
+       break;
+    }
+    
     return $reference;
   }
   
@@ -161,7 +191,130 @@ class Donation extends ContentEntityBase implements DonationInterface {
     $this->set('payment_details', $payment_method_id);
     return $this;
   }
-
+  
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getCustomer() {
+    $customer = $this->get('customer')->getValue()[0];
+    unset($customer['_attributes']);
+    return $customer;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getFirstName() {
+    $customer = $this->getCustomer();
+    $first_name = isset($customer['first_name']) ? $customer['first_name'] . ' ' : '';
+    return $first_name;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getLastName() {
+    $customer = $this->getCustomer();
+    $last_name = isset($customer['last_name']) ? $customer['last_name'] . ' ' : '';
+    return $last_name;
+  }
+  
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getFullName() {
+    $customer = $this->getCustomer();
+    $first_name = isset($customer['first_name']) ? $customer['first_name'] . ' ' : '';
+    $last_name = isset($customer['last_name']) ? $customer['last_name'] : '';
+    $full_name = $first_name . $last_name;
+    return $full_name;
+  }
+  
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getEmail($raw = FALSE) {
+    $customer = $this->getCustomer();
+    $email = isset($customer['email']) ? $customer['email'] : '';
+    switch ($raw) {
+      case TRUE:
+        $email = !empty($email) ? $email : '';
+        break;
+      case FALSE:
+        $email = !empty($email) ? '<a href="mailto:' . $email . '">' . $email . '</a>' : '';
+        break;
+    }
+    return $email;
+  }
+  
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getPostCode() {
+    $customer = $this->getCustomer();
+    $post_code = isset($customer['post_code']) ? trim(strtoupper($customer['post_code'])) : '';
+    return $post_code;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getAddressLine(int $number = 1) {
+    $customer = $this->getCustomer();
+    $line = isset($customer['address_' . $number]) ? $customer['address_' . $number] : '';
+    return $line;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getCity() {
+    $customer = $this->getCustomer();
+    $city = isset($customer['city']) ? $customer['city'] : '';
+    return $city;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getAddress() {
+    $address = [
+      'line_1' => !empty($this->getAddressLine(1)) ? $this->getAddressLine(1) . '<br>' : '',
+      'line_2' => !empty($this->getAddressLine(2)) ? $this->getAddressLine(2) . '<br>' : '',
+      'line_3' => !empty($this->getAddressLine(3)) ? $this->getAddressLine(3) . '<br>' : '',
+      'post_code' => !empty($this->getPostCode()) ?  $postcode . '<br>' : '',
+      'city' => !empty($this->getPostCode()) ? $city : '',
+    ];
+    
+    return implode($address);
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getResponseValues() {
+    return unserialize($this->get('response')->value);
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getResponseByMail(string $email) {
+    $like = '%' . trim($email) . '%';
+    $select = \Drupal::database()->select('donation_field_data', 'd')
+      ->distinct()
+      ->fields('d', ['response'])
+      ->condition('customer', $like, 'LIKE');
+    
+    $result = $select->execute()->fetchField();
+    return unserialize($result);
+  }
+  
+  
   /**
    * {@inheritdoc}
    */
@@ -177,6 +330,8 @@ class Donation extends ContentEntityBase implements DonationInterface {
     return $this;
   }
 
+  
+  
 
   /**
    * {@inheritdoc}
@@ -190,19 +345,13 @@ class Donation extends ContentEntityBase implements DonationInterface {
       ->setSettings(array(
         'max_length' => 50,
         'text_processing' => 0,
-      ));
-//      ->setDefaultValue('')
-//      ->setDisplayOptions('view', array(
-//        'type' => 'string',
-//        'weight' => -10,
-//        'label' => 'hidden',
-//      ))
-//      ->setDisplayOptions('form', array(
-//        'type' => 'string_textfield',
-//        'weight' => -10,
-//      ))
-//      ->setDisplayConfigurable('form', TRUE)
-//      ->setDisplayConfigurable('view', TRUE);
+      ))
+      ->setDisplayOptions('view', array(
+        'type' => 'string',
+        'weight' => -10,
+        'label' => 'hidden',
+      ))
+      ->setDisplayConfigurable('view', TRUE);
     
     
     $fields['reference'] = BaseFieldDefinition::create('string')
@@ -211,21 +360,14 @@ class Donation extends ContentEntityBase implements DonationInterface {
       ->setSettings(array(
         'max_length' => 255,
         'text_processing' => 0,
-      ));
-//      ->setDefaultValue('')
-//      ->setDisplayOptions('view', array(
-//        'type' => 'string',
-//        'weight' => -10,
-//        'label' => 'hidden',
-//      ))
-//      ->setDisplayOptions('form', array(
-//        'type' => 'string_textfield',
-//        'weight' => -10,
-//      ))
-//      ->setDisplayConfigurable('form', TRUE)
-//      ->setDisplayConfigurable('view', TRUE);
+      ))
+      ->setDisplayOptions('view', array(
+        'type' => 'string',
+        'weight' => -10,
+        'label' => 'above',
+      ))
+      ->setDisplayConfigurable('view', TRUE);
     
- 
   
     $fields['amount'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Amount'))
@@ -234,18 +376,6 @@ class Donation extends ContentEntityBase implements DonationInterface {
         'min' => 0,
         'text_processing' => 0,
       ));
-//      ->setDefaultValue(0)
-//      ->setDisplayOptions('view', array(
-//        'label' => 'above',
-//        'type' => 'number_integer',
-//        'weight' => -7,
-//      ))
-//      ->setDisplayOptions('form', array(
-//        'type' => 'number',
-//        'weight' => -7,
-//      ))
-//      ->setDisplayConfigurable('form', TRUE)
-//      ->setDisplayConfigurable('view', TRUE);
   
     
     $fields['currency_code'] = BaseFieldDefinition::create('string')
@@ -256,16 +386,6 @@ class Donation extends ContentEntityBase implements DonationInterface {
         'text_processing' => 0,
       ))
       ->setDefaultValue('GBP');
-//      ->setDisplayOptions('view', array(
-//        'type' => 'string',
-//        'weight' => -6,
-//      ))
-//      ->setDisplayOptions('form', array(
-//        'type' => 'string_textfield',
-//        'weight' => -6,
-//      ))
-//      ->setDisplayConfigurable('form', TRUE)
-//      ->setDisplayConfigurable('view', TRUE);
   
   
     $fields['status'] = BaseFieldDefinition::create('integer')
@@ -276,34 +396,24 @@ class Donation extends ContentEntityBase implements DonationInterface {
         'min' => 0,
         'text_processing' => 0,
       ))
-      ->setDefaultValue(0);
-//      ->setDisplayOptions('view', array(
-//        'label' => 'above',
-//        'type' => 'number_integer',
-//        'weight' => -5,
-//      ))
-//      ->setDisplayOptions('form', array(
-//        'type' => 'number',
-//        'weight' => -5,
-//      ))
-//      ->setDisplayConfigurable('form', FALSE)
-//      ->setDisplayConfigurable('view', TRUE);
+      ->setDefaultValue(0)
+      ->setDisplayOptions('view', array(
+        'label' => 'above',
+        'type' => 'number_integer',
+        'weight' => -5,
+      ))
+      ->setDisplayConfigurable('view', TRUE);
 
   
     $fields['customer'] = BaseFieldDefinition::create('map')
       ->setLabel(t('Customer Info'))
       ->setDescription(t('Fieldset containing customer Info'))
       ->setTranslatable(FALSE)
-      ->setDisplayOptions('view', array(
-        'type' => 'donation_customer',
-        'weight' => -4,
-      ))
       ->setDisplayOptions('form', array(
         'type' => 'donation_customer',
         'weight' => -4,
       ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+      ->setDisplayConfigurable('form', TRUE);
   
     $fields['payment_details'] = BaseFieldDefinition::create('donation_payment')
       ->setLabel(t('Payment Details'))
@@ -334,12 +444,9 @@ class Donation extends ContentEntityBase implements DonationInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
     
-    
-//    $fields['first_name'] = BaseFieldDefinition::create('string');
-//    $fields['last_name'] = BaseFieldDefinition::create('string');
-//    $fields['email'] = BaseFieldDefinition::create('string');
-
-
+  
+    $fields['response'] = BaseFieldDefinition::create('map')
+      ->setLabel(t('Response'));
     
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))

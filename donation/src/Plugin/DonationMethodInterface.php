@@ -2,7 +2,7 @@
 
 namespace Drupal\donation\Plugin;
 
-use Drupal\donation\Entity\DonationInterface;
+use Drupal\donation\Entity\Donation;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -42,10 +42,10 @@ interface DonationMethodInterface extends PluginInspectionInterface  {
   /**
    * Execute Payment and add related information to the Donation object.
    *
-   * @param $donation DonationInterface.
+   * @param $donation Donation.
    *   The Donation Entity being saved passed as reference.
    *
    */
-  public function execute(DonationInterface &$donation, array $form, FormStateInterface $form_state);
+  public function execute(Donation &$donation, array $form, FormStateInterface $form_state);
 
 }

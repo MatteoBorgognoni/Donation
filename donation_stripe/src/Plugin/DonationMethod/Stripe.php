@@ -3,11 +3,12 @@
 namespace Drupal\donation_stripe\Plugin\DonationMethod;
 
 use Drupal\donation\Plugin\DonationMethodBase;
-use Drupal\donation\Entity\DonationInterface;
+use Drupal\donation\Entity\Donation;
 use Drupal\Core\Form\FormStateInterface;
 use Stripe\Stripe as StripeApi;
 use Stripe\Charge;
 use Stripe\Error;
+use Stripe\Customer;
 
 /**
  * @DonationMethod(
@@ -95,33 +96,98 @@ class Stripe extends DonationMethodBase {
   /**
    * {@inheritdoc}
    */
-  public function execute(DonationInterface &$donation, array $form, FormStateInterface $form_state) {
+  public function execute(Donation &$donation, array $form, FormStateInterface $form_state) {
   
     $config = \Drupal::config('donation_stripe.settings');
     $mode = $config->get('mode');
-  
     $key = $config->get($mode . '_secret_key');
   
-    $token = $form_state->getUserInput()['stripeToken'];
-  
-    StripeApi::setApiKey($key);
-  
-    $amount = $donation->getAmount();
-    $currency = $donation->getCurrencyCode();
-  
-    try {
-      $charge = Charge::create(array(
-        'amount' => $amount, // Amount in cents!
-        'currency' => $currency,
-        'source' => $token,
-      ));
-      ksm($charge);
-    } catch (Error\Card $e) {
-      //TODO:  handling errors
-      $charge = FALSE;
+    // Stores errors:
+    $errors = [];
+    $input = $form_state->getUserInput();
+    
+    // Need a payment token:
+    if (isset($input['stripeToken'])) {
+      $token = $input['stripeToken'];
+    } else {
+      $errors['token'] = 'The order cannot be processed. Please make sure you have JavaScript enabled and try again.';
     }
     
-    return $charge;
+    $charge = FALSE;
+    $amount = $donation->getAmount(TRUE);
+    $email = $donation->getEmail(TRUE);
+    $full_name = $donation->getFullName();
+    $currency = $donation->getCurrencyCode();
+    $stripe_info = $donation->getResponseByMail($email);
+    
+    // If no errors, process the order:
+    if (empty($errors)) {
+      
+      try {
+        StripeApi::setApiKey($key);
+  
+        if(!$stripe_info) {
+          $customer = Customer::create([
+            'description' => 'Customer for ' . $email,
+            'source' => $token,
+          ]);
+          ksm('A');
+        } else {
+          $customer = Customer::retrieve($stripe_info['customer_id']);
+        }
+        
+        $charge = Charge::create([
+          'amount' => $amount, // Amount in cents!
+          'currency' => $currency,
+          'source' => $token,
+          'description' => 'Donation from ' . $email,
+          'customer' => $customer->id,
+        ]);
+  
+        $values = [
+          'charge_id' => $charge->id,
+          'customer_id' => $charge->customer,
+          'status' => $charge->status,
+        ];
+        
+        // Check that it was paid:
+        if ($charge->paid == true) {
+          
+          $donation->set('status', 1);
+          $donation->set('response', $values);
+    
+        } else { // Charge was not paid!
+  
+          $donation->set('status', 2);
+          $donation->set('response', $values);
+          
+        }
+        
+      } catch (Error\Card $e) {
+        //TODO:  handling errors
+        // Card was declined.
+        $e_json = $e->getJsonBody();
+        $err = $e_json['error'];
+        $errors['stripe'] = $err['message'];
+      } catch (Error\ApiConnection $e) {
+        $errors['network'] = 'Network Error';
+      } catch (Error\InvalidRequest $e) {
+        $errors['request'] = 'Bad Request';
+      } catch (Error\Api $e) {
+        $errors['server'] = 'Stripe servers down';
+      } catch (Error\Base $e) {
+        $errors['other'] = 'Unknown error';
+      }
+    } else {
+      $form_state->setError('form', $errors['token']);
+    }
+    
+    $data = [
+      'errors' => $errors,
+      'response' => $charge,
+    ];
+    
+    return $data;
   
   }
   

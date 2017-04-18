@@ -69,17 +69,8 @@ class DonationForm extends ContentEntityForm implements ContentEntityFormInterfa
     
     $form = parent::buildForm($form, $form_state);
   
-    ksm($_SESSION['donation']['redirect']);
     return $form;
     
-    
-  }
-
-  public function pay(array $form, FormStateInterface $form_state) {
-    
-    $settings = $this->getBundleSettings();
-    $method_id = $settings->get('payment_method');
-    //$method = $this->methodManager->createInstance($method_id)->execute($this->entity, $form, $form_state);
   }
   
   /**
@@ -87,30 +78,48 @@ class DonationForm extends ContentEntityForm implements ContentEntityFormInterfa
    */
   public function save(array $form, FormStateInterface $form_state) {
     $entity = &$this->entity;
-    $status = parent::save($form, $form_state);
-  
-    $this->pay($form, $form_state);
 
-//    switch ($status) {
-//      case SAVED_NEW:
-//        drupal_set_message($this->t('Created the %label Donation.', [
-//          '%label' => $entity->label(),
-//        ]));
-//        break;
-//
-//      default:
-//        drupal_set_message($this->t('Saved the %label Donation.', [
-//          '%label' => $entity->label(),
-//        ]));
-//    }
+    parent::save($form, $form_state);
+    $status = $entity->get('status')->value;
     
-    $redirect = $_SESSION['donation']['redirect'];
-    unset($_SESSION['donation']);
+    // Set label;
+    $line_item = $this->prepareLineItem();
+    $entity->setLineItem($line_item);
     
-    $redirect_entity_type = array_keys($redirect)[0];
-    $route = 'entity.' . $redirect_entity_type . '.canonical';
+    $response = [];
+    if ($status < 1) {
+      $payment = $this->pay($form, $form_state);
+
+  
+      $entity->save();
+  
+      if (isset($response['errors']) && !empty($response['errors']) && is_array($response['errors'])) {
+        $message = '<div class="alert alert-error"><h4>Error!</h4>The following error(s) occurred:<ul>';
+        foreach ($errors as $e) {
+          $message .=  "<li>$e</li>";
+        }
+        $message .= '</ul></div>';
     
-    $form_state->setRedirect($route, $redirect);
+        $form_state->setError('payment_details', $message);
+        $form_state->setRebuild(TRUE);
+      } else {
+        if (isset($_SESSION['donation'])) {
+          $redirect = $_SESSION['donation']['redirect'];
+          unset($_SESSION['donation']);
+        } else {
+          $redirect = ['donation' => $entity->id()];
+        }
+        $redirect_entity_type = array_keys($redirect)[0];
+        $route = 'entity.' . $redirect_entity_type . '.canonical';
+    
+        $form_state->setRedirect($route, $redirect);
+      }
+    } else {
+      $entity->save();
+      $form_state->setRedirect('entity.donation.canonical', ['donation' => $entity->id()]);
+    }
+
+
   }
   
   
@@ -148,6 +157,37 @@ class DonationForm extends ContentEntityForm implements ContentEntityFormInterfa
     
     return $actions;
   }
+  
+  
+  
+  public function pay(array $form, FormStateInterface $form_state) {
+    
+    $settings = $this->getBundleSettings();
+    $method_id = $settings->get('payment_method');
+    $method = $this->methodManager->createInstance($method_id);
+    $data = $method->execute($this->entity, $form, $form_state);
+    
+    return $data;
+  }
+  
+  public function prepareLineItem() {
+    
+    $line_item = '';
+    $entity = &$this->entity;
+    
+    if(empty($entity->getLineItem())) {
+      if(!empty($entity->getReference())) {
+        $ref = $entity->getReference(TRUE);
+        $type = strtoupper(substr($ref->getType(), 0 ,3));
+        $label = strtoupper(substr($ref->label(), 0, 3));
+        $line_item = $type . '-' . $label . '-' . str_pad($entity->id(), 6, 0, STR_PAD_LEFT);
+      } else {
+        $line_item = 'DON-' . str_pad($entity->id(), 6, 0);
+      }
+    }
+    return $line_item;
+  }
+  
   
   
 

@@ -1,1 +1,4 @@
+excluded:
+  - core.entity_form_display.donation.single.donate
+  - core.entity_form_mode.donation.donate
 required: true

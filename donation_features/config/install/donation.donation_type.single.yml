@@ -3,4 +3,4 @@ status: true
 dependencies: {  }
 id: single
 label: Single
-payment_method: null
+payment_method: stripe

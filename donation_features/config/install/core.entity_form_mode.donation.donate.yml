@@ -1,9 +1,0 @@
-langcode: en
-status: true
-dependencies:
-  module:
-    - donation
-id: donation.donate
-label: Donate
-targetEntityType: donation
-cache: true

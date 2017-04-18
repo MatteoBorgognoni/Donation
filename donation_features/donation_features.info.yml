@@ -3,5 +3,7 @@ type: module
 core: 8.x
 dependencies:
   - donation
+  - donation_field
+  - donation_stripe
   - field_group
 version: 8.x-1.0

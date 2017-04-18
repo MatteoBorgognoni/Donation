@@ -2,7 +2,7 @@
 
 namespace Drupal\donation\Plugin;
 
-use Drupal\donation\Entity\DonationInterface;
+use Drupal\donation\Entity\Donation;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -35,7 +35,7 @@ abstract class DonationMethodBase extends PluginBase implements DonationMethodIn
   /**
    * {@inheritdoc}
    */
-  public function execute(DonationInterface &$donation, array $form, FormStateInterface $form_state) {}
+  public function execute(Donation &$donation, array $form, FormStateInterface $form_state) {}
   
   
 }

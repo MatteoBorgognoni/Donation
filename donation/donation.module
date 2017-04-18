@@ -6,9 +6,12 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\donation\Entity\DonationTypeInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\donation\Entity\DonationType;
+use Drupal\donation\Plugin\Field\FieldWidget\DonationCustomer as CustomerWidget;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\core\Entity\EntityInterface;
 
 /**
  * Implements hook_help().
@@ -60,46 +63,95 @@ function donation_theme_suggestions_donation(array $variables) {
   return $suggestions;
 }
 
+function donation_preprocess_donation(&$variables) {
+  $donation = $variables['elements']['#donation'];
+  $content = $variables['content'];
+  ksm($donation->getResponseByMail('mail@matteoborgognoni.it'));
+}
+
+
 /**
- * Adds the default payment field to a donation type.
- *
- * @param \Drupal\donation\Entity\DonationTypeInterface $donation_type
- *   A Donation type object.
- * @param string $label
- *   (optional) The label for the field instance.
- *
- * @return \Drupal\field\Entity\FieldConfig
- *   A Donation Payment field object.
+ * Implements hook_entity_extra_field_info().
  */
-function donation_add_payment_field(DonationTypeInterface $donation_type, $label = 'Payment Details') {
-//
-//  $field_storage = FieldStorageConfig::loadByName('donation', 'donation_payment');
-//  $field = FieldConfig::loadByName('donation', $donation_type->id(), 'donation_payment');
-//  if (empty($field)) {
-//    $field = FieldConfig::create([
-//      'field_storage' => $field_storage,
-//      'bundle' => $donation_type->id(),
-//      'label' => $label,
-//      'settings' => array(),
-//    ]);
-//    $field->save();
-//
-//    // Assign widget settings for the 'default' form mode.
-//    entity_get_form_display('donation', $donation_type->id(), 'default')
-//      ->setComponent('donation_payment', array(
-//        'type' => 'donation_payment',
-//      ))
-//      ->save();
-//
-//    // Assign display settings for the 'default' and 'teaser' view modes.
-//    entity_get_display('donation', $donation_type->id(), 'default')
-//      ->setComponent('donation_payment', array(
-//        'label' => 'hidden',
-//        'type' => 'donation_payment',
-//      ))
-//      ->save();
-//
-//  }
-//
-  return $field;
+function donation_entity_extra_field_info() {
+  $extra = array();
+  
+  foreach (DonationType::loadMultiple() as $bundle) {
+    $extra['donation'][$bundle->Id()]['display']['full_name'] = array(
+      'label' => t('Full Name'),
+      'description' => t('This is the full name of the donor'),
+      'visible' => TRUE,
+    );
+  
+    $extra['donation'][$bundle->Id()]['display']['email'] = array(
+      'label' => t('Email'),
+      'description' => t('Email address of the donor'),
+      'visible' => TRUE,
+    );
+  
+    $extra['donation'][$bundle->Id()]['display']['address'] = array(
+      'label' => t('Address'),
+      'description' => t('Address of the donor'),
+      'visible' => TRUE,
+    );
+    
+    $extra['donation'][$bundle->Id()]['display']['donation_amount'] = array(
+      'label' => t('Donation Amount'),
+      'description' => t('Amount of the donation'),
+      'visible' => TRUE,
+    );
+  }
+  
+  return $extra;
+}
+
+
+
+
+/**
+ * Implements hook_ENTITY_TYPE_view().
+ */
+function donation_donation_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode, $langcode) {
+  
+  if ($display->getComponent('full_name')) {
+    $build['full_name'] = [
+      '#pseudo_field' => TRUE,
+      '#label_display' => 'above',
+      '#title' => 'Full Name',
+      '#type' => 'markup',
+      '#markup' => $entity->getFullName(),
+    ];
+  }
+  
+  if ($display->getComponent('full_name')) {
+    $build['email'] = [
+      '#pseudo_field' => TRUE,
+      '#label_display' => 'above',
+      '#title' => 'Email',
+      '#type' => 'markup',
+      '#markup' => $entity->getEmail(),
+    ];
+  }
+  
+  if ($display->getComponent('address')) {
+    $build['address'] = [
+      '#pseudo_field' => TRUE,
+      '#label_display' => 'above',
+      '#title' => 'Address',
+      '#type' => 'markup',
+      '#markup' => $entity->getAddress(),
+    ];
+  }
+  
+  
+  if ($display->getComponent('donation_amount')) {
+    $build['donation_amount'] = [
+      '#pseudo_field' => TRUE,
+      '#label_display' => 'above',
+      '#title' => 'Donation Amount',
+      '#type' => 'markup',
+      '#markup' => $entity->getFormattedAmount(),
+    ];
+  }
+  
 }

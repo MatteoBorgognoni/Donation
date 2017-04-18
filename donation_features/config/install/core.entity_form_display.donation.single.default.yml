@@ -8,23 +8,11 @@ dependencies:
     - field_group
 third_party_settings:
   field_group:
-    group_test:
-      children:
-        - gift_aid
-      parent_name: ''
-      weight: 1
-      format_type: details
-      format_settings:
-        id: ''
-        classes: ''
-        open: false
-        required_fields: true
-      label: Test
     group_donation:
       children:
         - group_billing_information
-        - group_test_2
         - group_payment_details
+        - group_gift_aid
       parent_name: ''
       weight: 0
       format_type: accordion
@@ -33,18 +21,6 @@ third_party_settings:
         classes: ''
         effect: bounceslide
       label: Donation
-    group_test_2:
-      children: {  }
-      parent_name: group_donation
-      weight: 21
-      format_type: accordion_item
-      format_settings:
-        id: ''
-        classes: ''
-        formatter: closed
-        required_fields: true
-        description: ''
-      label: 'Test 2'
     group_billing_information:
       children:
         - customer
@@ -62,7 +38,7 @@ third_party_settings:
       children:
         - payment_details
       parent_name: group_donation
-      weight: 22
+      weight: 21
       format_type: accordion_item
       format_settings:
         id: ''
@@ -71,6 +47,19 @@ third_party_settings:
         required_fields: true
         description: ''
       label: 'Payment Details'
+    group_gift_aid:
+      children:
+        - gift_aid
+      parent_name: group_donation
+      weight: 22
+      format_type: accordion_item
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        required_fields: true
+        description: ''
+      label: 'Gift Aid'
 id: donation.single.default
 targetEntityType: donation
 bundle: single
@@ -132,8 +121,7 @@ content:
     type: donation_payment
     weight: 2
     region: content
-    settings:
-      payment_method: stripe
+    settings: {  }
     third_party_settings: {  }
   reference:
     type: string_textfield

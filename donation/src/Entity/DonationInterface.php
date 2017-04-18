@@ -45,10 +45,13 @@ interface DonationInterface extends  ContentEntityInterface, EntityChangedInterf
   /**
    * Gets the Donation Amount.
    *
+   * @param boolean $raw
+   *   If the amount returned should be formatted or not.
+   *
    * @return string
    *   Amount of the Donation.
    */
-  public function getAmount();
+  public function getAmount($raw = FALSE);
   
   /**
    * Sets the Donation Amount.

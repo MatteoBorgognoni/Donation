@@ -1,0 +1,78 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - donation.donation_type.single
+  module:
+    - donation
+id: donation.single.default
+targetEntityType: donation
+bundle: single
+mode: default
+content:
+  amount:
+    label: above
+    type: number_integer
+    weight: 2
+    region: content
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+  currency_code:
+    type: string
+    weight: 3
+    region: content
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  customer:
+    type: donation_customer
+    weight: 5
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  gift_aid:
+    type: boolean
+    weight: 7
+    region: content
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+  line_item:
+    type: string
+    weight: 0
+    label: hidden
+    region: content
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  payment_details:
+    type: donation_payment
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 6
+  reference:
+    type: donation_referencer
+    weight: 1
+    label: above
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    label: above
+    type: number_integer
+    weight: 4
+    region: content
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+hidden: {  }

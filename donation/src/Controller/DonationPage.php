@@ -75,7 +75,6 @@ class DonationPage extends ControllerBase {
    *   Return Hello string.
    */
   public function build() {
-    
     $settings = $_SESSION['donation'];
     $values = [
       'type' => $settings['donation_profile'],
@@ -85,7 +84,6 @@ class DonationPage extends ControllerBase {
     
     $donation->setAmount($settings['amount']);
     $donation->setReference($settings['reference']);
-    $donation->setPaymentMethod($settings['donation_method']);
     
     $form = $this->entityFormBuilder->getForm($donation);
     $form['#attached']['drupalSettings']['donation']['form_id'] = $form['#id'];

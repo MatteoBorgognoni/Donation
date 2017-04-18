@@ -79,7 +79,7 @@ class DonationCustomer extends FormatterBase {
     $values = $item->getValue();
     
     foreach ($values as $key => $value) {
-      if (is_string($value) && !empty($value)) {
+      if (is_string($value) && !empty($value) && isset($customerfields[$key])) {
         $output = '<div class="field__label">' . $customerfields[$key]['title'] . '</div>';
         $output .= '<div class="field__item field__' . Html::cleanCssIdentifier($key) . '>' . $value . '</div>';
         $fields[$key] = $output;

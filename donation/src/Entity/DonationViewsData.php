@@ -16,7 +16,7 @@ class DonationViewsData extends EntityViewsData {
     $data = parent::getViewsData();
 
     // TODO: Implement Custom views fields
-    ksm($data);
+    //ksm($data);
 
     return $data;
   }
