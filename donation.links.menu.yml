@@ -1,0 +1,37 @@
+
+# Donation menu items definition
+entity.donation.collection:
+  title: 'Donations'
+  route_name: entity.donation.collection
+  description: 'List Donation entities'
+  parent: system.admin_content
+  weight: 100
+
+
+# Donation type menu items definition
+entity.donation_type.collection:
+  title: 'Donation type'
+  route_name: entity.donation_type.collection
+  description: 'List Donation type (bundles)'
+  parent: system.admin_structure
+  weight: 99
+
+donation.donation_settings:
+  title: 'Donation Settings'
+  route_name: donation.donation_settings
+  parent: system.admin_config
+  weight: 99
+
+# Thanks menu items definition
+entity.thanks.collection:
+  title: 'Thank you pages'
+  route_name: entity.thanks.collection
+  description: 'List Thanks pages'
+  parent: system.admin_content
+  weight: 100
+
+thanks.admin.structure.settings:
+  title: 'Thank you pages settings'
+  description: 'Configure Thanks pages'
+  route_name: thanks.settings
+  parent: system.admin_structure

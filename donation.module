@@ -1,0 +1,164 @@
+<?php
+
+/**
+ * @file
+ * Contains donation.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\donation\Entity\DonationType;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\core\Entity\EntityInterface;
+use Drupal\Component\Utility\SafeMarkup;
+
+/**
+ * Implements hook_help().
+ */
+function donation_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the donation module.
+    case 'help.page.donation':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Donation Entity') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function donation_theme($existing, $type, $theme, $path) {
+  $themes = [];
+  $themes['donation'] = [
+    'render element' => 'elements',
+    'file' => 'donation.page.inc',
+    'template' => 'donation',
+  ];
+
+  $themes['donation_content_add_list'] = [
+    'render element' => 'content',
+    'variables' => ['content' => NULL],
+    'file' => 'donation.page.inc',
+  ];
+
+  $themes['donation_email'] = [
+    'file' => 'donation.email.inc',
+    'variables' => [
+      'donation' => NULL,
+    ]
+  ];
+
+  $themes['thanks'] = [
+    'render element' => 'elements',
+    'file' => 'thanks.page.inc',
+    'template' => 'thanks',
+  ];
+
+  $themes['thanks_default'] = [
+    'variables' => [
+      'donation' => NULL,
+    ],
+  ];
+  
+  return $themes;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function donation_theme_suggestions_donation_email(array $variables) {
+  /* @var \Drupal\donation\Entity\DonationInterface $donation */
+  $donation = $variables['donation'];
+  $profile = $donation->getType();
+  $origin_id = $donation->getOrigin()->id();
+  $suggestions = [];
+  $suggestions[] = 'donation_email__' . $profile;
+  $suggestions[] = 'donation_email__' . $profile . '__' . $origin_id;
+  return $suggestions;
+}
+
+
+/**
+* Implements hook_theme_suggestions_HOOK().
+*/
+function donation_theme_suggestions_donation(array $variables) {
+  $suggestions = array();
+  $entity = $variables['elements']['#donation'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'donation__' . $sanitized_view_mode;
+  $suggestions[] = 'donation__' . $entity->bundle();
+  $suggestions[] = 'donation__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'donation__' . $entity->id();
+  $suggestions[] = 'donation__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}
+
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function donation_preprocess_form(&$variables) {
+  
+  $form = $variables['element'];
+  if (isset($form['#entity_type']) && $form['#entity_type'] == 'donation') {
+      // Set donation profile
+    $variables['donation_profile'] = isset($form['#bundle']) ? $form['#bundle'] : FALSE;
+    // Set Step count
+    $variables['step_count'] = isset($form['#step_count']) ? $form['#step_count'] : FALSE;
+    // Set Step Label
+    $variables['step_label'] = isset($form['#step_label']) ? $form['#step_label'] : FALSE;
+    // Set Step Number
+    $variables['step_number'] = isset($form['#step_number']) ? $form['#step_number'] : FALSE;
+    // Set Group machine name variable
+    $variables['group_id'] = isset($form['#group_id']) ? $form['#group_id'] : FALSE;
+    // Set Step Machine name variable
+    $variables['step'] = isset($form['#group_id']) ? $form['#step'] : FALSE;
+    // Set Amount Variable
+    $variables['amount'] = isset($form['#amount']) ? $form['#amount'] : FALSE;
+    // Set calculated Gift aid variable
+    $variables['gift_aid'] = isset($form['#amount']) ? number_format($form['#amount'] * 1.25, 2) : FALSE;
+  
+  }
+}
+
+function donation_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
+  switch ($hook) {
+    case 'form':
+      $form = $variables['element'];
+      if (isset($form['#entity_type']) && $form['#entity_type'] == 'donation') {
+        
+        $suggestions[] = 'form__donation';
+        $suggestions[] = 'form__donation__' . $form['#bundle'];
+    
+        if (isset($form['#mode'])) {
+          $suggestions[] = 'form__donation__' . $form['#bundle'] . '__' . $form['#mode'];
+        }
+  
+        if (isset($form['#step'])) {
+          $suggestions[] = 'form__donation__' . $form['#step'];
+          $suggestions[] = 'form__donation__' . $form['#bundle'] . '__' . $form['#step'];
+        }
+      }
+      break;
+  }
+}
+
+
+/**
+ * Implements hook_mail().
+ */
+function donation_mail($key, &$message, $params) {
+  switch ($key) {
+    default:
+      if (!empty($params['from'])) {
+        $message['from'] = $params['from'];
+      }
+      $message['subject'] = $params['subject'];
+      $message['body'][] = $params['message'];
+      break;
+  }
+}

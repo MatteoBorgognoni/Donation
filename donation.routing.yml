@@ -1,0 +1,38 @@
+donation.donation_page_build:
+  path: '/donation/{profile}/{step}'
+  defaults:
+    _controller: '\Drupal\donation\Controller\DonationPage::build'
+    _title_callback: '\Drupal\donation\Controller\DonationPage::setTitle'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      step:
+        type: step
+      profile:
+        type: profile
+
+donation.multiple_delete_confirm:
+  path: '/admin/content/donation/delete'
+  defaults:
+    _form: '\Drupal\donation\Form\DeleteMultiple'
+  requirements:
+    _permission: 'administer donation entities'
+
+donation.donation_settings:
+  path: '/admin/config/donation'
+  defaults:
+    _form: '\Drupal\donation\Form\DonationSettings'
+    _title: 'DonationSettings'
+  requirements:
+    _permission: 'administer donation entities'
+  options:
+    _admin_route: TRUE
+
+donation.donation_redirect_page:
+  path: '/donation/thank-you'
+  defaults:
+    _controller: '\Drupal\donation\Controller\DonationRedirectPage::build'
+    _title_callback: '\Drupal\donation\Controller\DonationRedirectPage::setTitle'
+  requirements:
+    _permission: 'access content'

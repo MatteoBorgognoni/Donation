@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - donation
+id: donation_delete_action
+label: 'Delete donations'
+type: donation
+plugin: donation_delete_action
+configuration: {  }

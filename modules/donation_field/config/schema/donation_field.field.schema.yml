@@ -1,0 +1,21 @@
+donation_field.field.widget.map.base:
+  type: mapping
+  label: 'Donation field Widget Base'
+  mapping:
+    donation_type:
+      type: string
+      label: 'Default Donation type'
+    thanks_id:
+      type: integer
+      label: 'Default Thank you page ID'
+
+field.value.donation_field:
+  type: mapping
+  label: 'Default value'
+  mapping:
+    donation_type:
+      type: text
+      label: 'Donation type'
+    thanks_id:
+      type: integer
+      label: 'Default Thank you page ID'

@@ -1,7 +1,0 @@
-field.field_settings.donation:
-  type: mapping
-  label: Donation Form field settings
-  mapping:
-    donation_profile:
-      type: string
-      label: The Donation Profile

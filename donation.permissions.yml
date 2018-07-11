@@ -1,0 +1,44 @@
+add donation entities:
+  title: 'Create new Donation entities'
+
+administer donation entities:
+  title: 'Administer Donation entities'
+  description: 'Allow to access the administration form to configure Donation entities.'
+  restrict access: true
+
+delete donation entities:
+  title: 'Delete Donation entities'
+
+edit donation entities:
+  title: 'Edit Donation entities'
+
+access donation overview:
+  title: 'Access the Donation overview page'
+
+view published donation entities:
+  title: 'View published Donation entities'
+
+view unpublished donation entities:
+  title: 'View unpublished Donation entities'
+add donor entities:
+  title: 'Create new Donor entities'
+
+administer thanks entitites:
+  title: 'Administer Thank you pages'
+  description: 'Allow to access the administration form to configure Thank you pages.'
+  restrict access: true
+
+add thanks entities:
+  title: 'Create new Thank tou pages'
+
+delete thanks entities:
+  title: 'Delete Thanks entities'
+
+edit thanks entities:
+  title: 'Edit Thanks entities'
+
+view published thanks entities:
+  title: 'View published Thanks entities'
+
+view unpublished thanks entities:
+  title: 'View unpublished Thanks entities'

@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Contains donation_webform_field.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function donation_field_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the donation module.
+    case 'help.page.donation_field':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Donation Field') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ *
+ * Provide Theme suggestions for the donation field
+ *
+ * Implements hook_theme_suggestions_alter().
+ */
+function donation_field_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
+  
+  if($hook == 'form') {
+    $form = $variables['element'];
+    if (isset($form['#field_type']) && $form['#field_type'] == 'donation' ) {
+    
+      $suggestions[] = 'form__donation_field';
+      $suggestions[] = 'form__donation_field__' . $form['#bundle'];
+      $suggestions[] = 'form__donation_field__' . $form['#view_mode'];
+      $suggestions[] = 'form__donation_field__' . $form['#bundle'] . '__' . $form['#view_mode'];
+    }
+  }
+}
+
